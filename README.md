@@ -1,4 +1,4 @@
-# Advant of Code
+# Advent of Code
 Repo for https://adventofcode.com/2023/
 
 I've been struggling a little lately with making coding fun and interesting and I thought doing a challenge could change that. Hopefully this will reinstore my passion for coding! :)
