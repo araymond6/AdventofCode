@@ -137,4 +137,5 @@ int	main()
 		total += check_game(line);
 	}
 	printf("total: %d\n", total);
+	fclose(file);
 }
