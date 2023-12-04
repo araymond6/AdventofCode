@@ -16,8 +16,8 @@ typedef enum token
 	OTHER
 }	t_token;
 
-// defining colors
-int redmin, greenmin, bluemin;
+// defining colors and their limits
+int redmin = 0, greenmin = 0, bluemin = 0;
 char cubes[3][6] = {
 	{'r', 'e', 'd', '\0'},
 	{'g', 'r', 'e', 'e', 'n', '\0'},
@@ -51,35 +51,28 @@ int	get_value(char *line)
 	return (atoi(num));
 }
 
-void	reset_min()
-{
-	redmin = 0;
-	greenmin = 0;
-	bluemin = 0;
-}
-
-int	check_min(int value, int color)
+// sets the value if the # of cubes pulled out is higher than what has been seen
+void	set_value(int value, int color)
 {
 	if (color == RED)
 	{
-		if (value > redlimit)
-			return (1);
+		if (value > redmin)
+			redmin = value;
 	}
 	else if (color == GREEN)
 	{
-		if (value > greenlimit)
-			return (1);
+		if (value > greenmin)
+			greenmin = value;
 	}
 	else //if color is blue
 	{
-		if (value > bluelimit)
-			return (1);
+		if (value > bluemin)
+			bluemin = value;
 	}
-	return (0);
 }
 
-// returns 1 if the amount of cubes pulled out is over the limit
-int	validate_cube(char *line, int value)
+// checks color to change, if needed
+void	check_color(char *line, int value)
 {
 	int	color = 0;
 
@@ -87,13 +80,18 @@ int	validate_cube(char *line, int value)
 	{
 		if (strncmp(cubes[color], line, strlen(cubes[color])) == 0)
 		{
-			if (check_limits(value, color) == 1)
-				return (1);
+			set_value(value, color);
 			break;
 		}
 		color++;
 	}
-	return (0);
+}
+
+void	reset_min(void)
+{
+	redmin = 0;
+	greenmin = 0;
+	bluemin = 0;
 }
 
 int	check_game(char *line)
@@ -105,6 +103,9 @@ int	check_game(char *line)
 		line++;
 	line += 2;
 
+	//resetting values for new game
+	reset_min();
+
 	while (*line != '\0')
 	{
 		int value = get_value(line);
@@ -114,11 +115,7 @@ int	check_game(char *line)
 			line++;
 			type = get_type(*line);
 		}
-		if (validate_cube(line, value) == 1)
-		{
-			gameid++;
-			return (0);
-		}
+		check_color(line, value);
 		type = get_type(*line);
 		while (type != DIGIT && *line != '\0') // setting up start of the loop
 		{
@@ -126,12 +123,12 @@ int	check_game(char *line)
 			type = get_type(*line);
 		}
 	}
-	return (gameid++);
+	return (redmin * greenmin * bluemin);
 }
 
 int	main()
 {
-	FILE *file = fopen("dataexample2", "r");
+	FILE *file = fopen("data", "r");
 	unsigned int total = 0;
 	char line[500];
 
